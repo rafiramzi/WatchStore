@@ -1,7 +1,12 @@
 <?php
 include("db.php");
 session_start();
-
+if (isset($_SESSION['username'])) {
+    if(!isset($_SESSION['two_fa']) || $_SESSION['two_fa'] !== 'true') {
+        header('Location: /login');
+        exit;
+    }
+}
 $searchQuery = $_GET['search'] ?? '';
 
 $sql = ($searchQuery !== '')

@@ -1,49 +1,36 @@
 <?php
 include("../db.php");
-
 ob_start();
 session_start();
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 $message = '';
 
+if (!isset($_SESSION['username']) || !isset($_SESSION['two_fa']) || $_SESSION['two_fa'] !== 'false') {
+    header('Location: /login');
+    exit;
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $user = $_POST['username']; 
-    $pass = $_POST['password'];
+    $user = $_POST['username'] ?? '';
+    $otp = $_POST['otp'] ?? '';
 
-    $sql = "SELECT * FROM users WHERE username = '$user' AND password = '$pass'";
-
-    $result = $conn->query($sql);
-
-    if ($result && $result->num_rows >= 1) {
-        $row = $result->fetch_assoc();
-        $_SESSION['username'] = $row['username'];
-        $_SESSION['two_fa'] = 'false';
-
-        $otp = rand(100000, 999999);
-
-        error_log("Generated OTP: $otp");
-
-        echo "
-        <form id='otpForm' method='POST' action='/login/2fa/index.php'>
-            <input type='hidden' name='username' value='{$row['username']}'>
-            <input type='hidden' name='otp' value='$otp'>
-        </form>
-        <script>document.getElementById('otpForm').submit();</script>
-        ";
+    if (strlen($otp) === 6 && ctype_digit($otp)) {
+        $_SESSION['username'] = $user;
+        header("Location: /");
         exit;
+    } else {
+        $message = "Invalid OTP!";
     }
 }
 ?>
+
 
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login - WatchStore DVWA</title>
+    <title>2FA Verification - WatchStore DVWA</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -103,11 +90,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 
 <div class="login-box">
-    <h2>Login to WatchStore</h2>
+    <center>
+            <P><?php echo $_POST['username'];  ?></P>
+    </center>
+    <h2>Login success. Complete the 2FA Authentication below.</h2>
     <form method="POST">
-        <input name="username" placeholder="Username" required />
-        <input name="password" type="password" placeholder="Password" required />
-        <button type="submit">Login</button>
+        <input name="otp" placeholder="OTP Recived from your email" required />
+        <button type="submit">Verify</button>
     </form>
     <?php if ($message): ?>
         <div class="message"><?= $message ?></div>
