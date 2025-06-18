@@ -10,10 +10,9 @@ error_reporting(E_ALL);
 $message = '';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $user = $_POST['username']; // 🔥 No escaping = vulnerable
+    $user = $_POST['username']; 
     $pass = $_POST['password'];
 
-    // ✅ Vulnerable SQL (do not fix escaping)
     $sql = "SELECT * FROM users WHERE username = '$user' AND password = '$pass'";
 
     $result = $conn->query($sql);

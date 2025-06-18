@@ -2,7 +2,6 @@
 include("../db.php");
 
 session_start();
-// Check if user is logged in
 if (!isset($_SESSION['username'])) {
     header('Location: /login.php');
     exit;
@@ -11,7 +10,6 @@ if (!isset($_SESSION['username'])) {
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
 
-    // ❌ VULNERABLE TO SQL INJECTION — INTENTIONAL
     $sql = "SELECT * FROM products WHERE id = $id";
     $result = $conn->query($sql);
 

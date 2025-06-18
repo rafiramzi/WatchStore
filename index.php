@@ -1,18 +1,15 @@
 <?php
-include("db.php"); // Connects to database with `products` table
+include("db.php");
 session_start();
 
 $searchQuery = $_GET['search'] ?? '';
 
-// 🔥 INTENTIONALLY VULNERABLE SQL (for testing with sqlmap)
 $sql = ($searchQuery !== '')
     ? "SELECT * FROM products WHERE name LIKE '%$searchQuery%'"
     : "SELECT * FROM products";
 
-// Execute query
 $result = $conn->query($sql);
 
-// Handle query failure gracefully
 if (!$result) {
     die("<strong>SQL Error:</strong> " . $conn->error);
 }
@@ -150,7 +147,7 @@ if (!$result) {
         <div class="search-result">
             <strong>You searched for:</strong>
             <div class="xss-box">
-                <?= $_GET['search'] ?> <!-- 🔥 XSS Vulnerable output -->
+                <?= $_GET['search'] ?> 
             </div>
         </div>
     <?php endif; ?>
